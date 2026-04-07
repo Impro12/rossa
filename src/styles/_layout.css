@@ -35,6 +35,13 @@ html, body {
   padding: var(--space-5) var(--space-8);
   background: linear-gradient(to bottom, rgba(10,8,6,0.85) 0%, transparent 100%);
   pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.header--hidden {
+  opacity: 0;
+  transform: translateY(-100%);
+  pointer-events: none;
 }
 
 .brand {
@@ -63,6 +70,41 @@ html, body {
   transition: color var(--transition-base);
 }
 .nav-link:hover { color: var(--color-text); }
+
+/* ── Mobile Header ───────────────────────────────────── */
+@media (max-width: 768px) {
+  .header {
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .header-nav {
+    gap: var(--space-5);
+  }
+
+  .nav-link {
+    font-size: var(--text-xs);
+  }
+
+  .brand {
+    font-size: var(--text-xs);
+  }
+
+  .brand svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-nav {
+    gap: var(--space-4);
+  }
+
+  /* Hide secondary nav links on very small screens, keep theme toggle */
+  .header-nav .nav-link:not(.theme-toggle-btn):not(:last-of-type) {
+    display: none;
+  }
+}
 
 /* ── Gradient vignette at bottom ──────────────────────── */
 .app::after {

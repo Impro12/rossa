@@ -51,6 +51,18 @@ async function bootstrap() {
   }
   requestAnimationFrame(lenisRaf);
 
+  // Hide header after first scroll, show again when back at top
+  const siteHeader = document.getElementById('site-header');
+  if (siteHeader) {
+    lenis.on('scroll', ({ scroll }) => {
+      if (scroll > 80) {
+        siteHeader.classList.add('header--hidden');
+      } else {
+        siteHeader.classList.remove('header--hidden');
+      }
+    });
+  }
+
   // 3. Loading Manager
   const loadingManager = new THREE.LoadingManager();
   const loadingScreenUI = new LoadingScreen(loadingManager);
