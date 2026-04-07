@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rossa Design System Test</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  
+  <!-- Fonts -->
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600&f[]=cormorant-garamond@300,400,500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/styles/index.css" />
+
+  <style>
+    body { padding: var(--space-8); overflow: auto; }
+    .swatch { width: 100px; height: 100px; border-radius: var(--radius-md); border: 1px solid var(--color-border); }
+    .swatch-container { display: flex; gap: var(--space-4); margin-bottom: var(--space-8); }
+    section { margin-bottom: var(--space-8); }
+    .btn { padding: var(--space-3) var(--space-6); background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; }
+    .btn.primary { background: var(--color-accent); color: var(--color-deep-charcoal); border: none; }
+  </style>
+</head>
+<body>
+  <header style="margin-bottom: var(--space-10); display: flex; align-items: center; gap: var(--space-4);">
+    <svg width="48" height="48" viewBox="0 0 100 100" fill="currentColor">
+      <rect x="20" y="15" width="20" height="70" rx="3" />
+      <path d="M45 45 L75 15 L90 30 L60 60 Z" rx="3" />
+      <path d="M45 55 L75 85 L90 70 L60 40 Z" rx="3" />
+    </svg>
+    <div>
+      <h1>Rossa Design System</h1>
+      <p class="label-upper">Validating Typography & Colors</p>
+    </div>
+  </header>
+
+  <section>
+    <h2>Color Palette</h2>
+    <div class="swatch-container">
+      <div>
+        <div class="swatch" style="background: var(--color-bg)"></div>
+        <p class="label-upper" style="margin-top: 8px;">BG</p>
+      </div>
+      <div>
+        <div class="swatch" style="background: var(--color-surface)"></div>
+        <p class="label-upper" style="margin-top: 8px;">Surface</p>
+      </div>
+      <div>
+        <div class="swatch" style="background: var(--color-accent)"></div>
+        <p class="label-upper" style="margin-top: 8px;">Accent</p>
+      </div>
+      <div>
+        <div class="swatch" style="background: var(--color-text-muted)"></div>
+        <p class="label-upper" style="margin-top: 8px;">Muted Stone</p>
+      </div>
+      <div>
+        <div class="swatch" style="background: var(--color-text)"></div>
+        <p class="label-upper" style="margin-top: 8px;">Text</p>
+      </div>
+    </div>
+    <button class="btn" onclick="document.documentElement.style.colorScheme = document.documentElement.style.colorScheme === 'dark' ? 'light' : 'dark'">Toggle OS light/dark (force testing)</button>
+  </section>
+
+  <section>
+    <h2>Typography</h2>
+    <div style="background: var(--color-surface); padding: var(--space-6); border: 1px solid var(--color-border); border-radius: var(--radius-lg);">
+      <h1>H1. Cormorant Garamond</h1>
+      <h2>H2. Bespoke Kitchen Architecture</h2>
+      <h3>H3. Discover the materials</h3>
+      <p style="margin-top: var(--space-4);">Body. General Sans is a highly legible rationalist sans-serif. It pairs well with the elegance of Cormorant Garamond to create a luxury feel for the Rossa configurator.</p>
+      <p class="label-upper" style="margin-top: var(--space-4);">Label Upper // 001</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Components</h2>
+    <div style="display: flex; gap: var(--space-4);">
+      <button class="btn primary">View Configuration</button>
+      <button class="btn">Learn More</button>
+    </div>
+  </section>
+</body>
+</html>

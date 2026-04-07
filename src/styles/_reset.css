@@ -1,0 +1,8 @@
+/* ── _reset.css ── modern minimal reset */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body { line-height: 1.5; -webkit-font-smoothing: antialiased; }
+img, video, svg { display: block; max-width: 100%; }
+button { cursor: pointer; background: none; border: none; font: inherit; }
+a { color: inherit; text-decoration: none; }
+[hidden] { display: none !important; }

@@ -1,0 +1,74 @@
+/* ── _toolbar.css ── bottom zone navigation bar */
+
+.toolbar {
+  position: absolute;
+  bottom: var(--space-6);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-toolbar);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-lg);
+  animation: fadeInUp 0.7s 0.3s both;
+}
+
+.toolbar-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  transition:
+    color var(--transition-base),
+    background var(--transition-base);
+  white-space: nowrap;
+  position: relative;
+}
+
+.toolbar-btn svg {
+  transition: transform var(--transition-base);
+}
+
+.toolbar-btn:hover {
+  color: var(--color-text);
+  background: rgba(255,248,236,0.06);
+}
+.toolbar-btn:hover svg {
+  transform: translateY(-1px);
+}
+
+.toolbar-btn.active {
+  color: var(--color-accent);
+  background: var(--color-accent-dim);
+}
+.toolbar-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--color-border);
+  margin: 0 var(--space-1);
+  flex-shrink: 0;
+}

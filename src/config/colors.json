@@ -1,0 +1,8 @@
+[
+  { "id": "f_arctic", "name": "Arctic White", "hex": "#f2f2f0" },
+  { "id": "f_sand", "name": "Desert Sand", "hex": "#dfd7c8" },
+  { "id": "f_clay", "name": "Warm Clay", "hex": "#bfa286" },
+  { "id": "f_sage", "name": "Sage Green", "hex": "#8ba391" },
+  { "id": "f_navy", "name": "Midnight Navy", "hex": "#2a3b4c" },
+  { "id": "f_charcoal", "name": "Deep Charcoal", "hex": "#1a1a18" }
+]

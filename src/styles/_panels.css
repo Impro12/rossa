@@ -1,0 +1,238 @@
+/* ── _panels.css ── side configuration panels */
+
+.panel {
+  position: absolute;
+  right: var(--space-6);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: var(--z-panel);
+  width: 280px;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-6);
+  animation: slideInRight 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+
+.panel-title {
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  color: var(--color-text);
+}
+
+.panel-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.panel-close:hover {
+  background: rgba(255,255,255,0.08);
+  color: var(--color-text);
+}
+
+.panel-hint {
+  margin-top: var(--space-4);
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+/* ── Color Swatches ───────────────────────────────────── */
+.swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-2);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  transition:
+    border-color var(--transition-base),
+    background var(--transition-base),
+    transform var(--transition-fast);
+}
+.swatch:hover {
+  background: rgba(255,248,236,0.05);
+  transform: translateY(-1px);
+}
+.swatch.active {
+  border-color: var(--color-accent);
+  background: var(--color-accent-dim);
+}
+
+.swatch-dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.12);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  flex-shrink: 0;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+.swatch:hover .swatch-dot {
+  transform: scale(1.08);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+}
+.swatch.active .swatch-dot {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-dim), 0 2px 10px rgba(0,0,0,0.4);
+}
+
+.swatch-name {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  text-align: center;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+}
+.swatch.active .swatch-name { color: var(--color-accent); }
+
+.swatch-price {
+  font-size: 9px;
+  color: var(--color-text-subtle);
+  letter-spacing: 0.03em;
+}
+
+/* ── Material Cards ───────────────────────────────────── */
+.mat-section {
+  margin-bottom: var(--space-6);
+}
+.mat-section:last-child { margin-bottom: 0; }
+
+.mat-section-title {
+  font-size: var(--text-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-3);
+  font-weight: 500;
+  font-family: var(--font-sans);
+}
+
+.mat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2);
+}
+
+.mat-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  transition:
+    border-color var(--transition-base),
+    transform var(--transition-fast),
+    box-shadow var(--transition-base);
+  text-align: left;
+}
+.mat-card:hover {
+  border-color: var(--color-border-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.mat-card.active {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.mat-thumb {
+  height: 64px;
+  background: var(--color-surface-3);
+  background-size: cover;
+  background-position: center;
+}
+
+.mat-info {
+  padding: var(--space-2) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--color-surface-2);
+}
+.mat-name {
+  font-size: var(--text-xs);
+  color: var(--color-text);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.mat-price {
+  font-size: 10px;
+  color: var(--color-text-subtle);
+}
+
+/* ── Handle Chips ─────────────────────────────────────── */
+.handle-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.handle-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  transition:
+    border-color var(--transition-base),
+    color var(--transition-base),
+    background var(--transition-base);
+}
+.handle-chip:hover {
+  border-color: var(--color-border-hover);
+  color: var(--color-text);
+  background: rgba(255,248,236,0.04);
+}
+.handle-chip.active {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+  background: var(--color-accent-dim);
+}
+
+.handle-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  flex-shrink: 0;
+}
+
+.handle-price {
+  margin-left: auto;
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
+}

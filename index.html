@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rossa — Premium Boutique Kitchen Configurator</title>
+
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600&f[]=cormorant-garamond@300,400,500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/styles/index.css" />
+  <link rel="stylesheet" href="/src/styles/landing.css" />
+
+</head>
+<body>
+
+  <!-- LOADING SCREEN -->
+  <div id="loading-screen" class="loading-screen">
+    <div class="loading-logo">
+      <svg width="48" height="48" viewBox="0 0 100 100" fill="var(--color-accent)">
+        <rect x="20" y="15" width="20" height="70" rx="3" />
+        <path d="M45 45 L75 15 L90 30 L60 60 Z" rx="3" />
+        <path d="M45 55 L75 85 L90 70 L60 40 Z" rx="3" />
+      </svg>
+    </div>
+    <div class="loading-bar-wrap">
+      <div id="loading-bar" class="loading-bar"></div>
+    </div>
+    <div class="loading-text">Assemble in progress...</div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="header" id="site-header">
+    <a href="/" class="brand" aria-label="Rossa Home">
+      <svg width="28" height="28" viewBox="0 0 100 100" fill="currentColor">
+        <rect x="20" y="15" width="20" height="70" rx="3" />
+        <path d="M45 45 L75 15 L90 30 L60 60 Z" rx="3" />
+        <path d="M45 55 L75 85 L90 70 L60 40 Z" rx="3" />
+      </svg>
+      <span>ROSSA</span>
+    </a>
+    <nav class="header-nav">
+      <a href="#features" class="nav-link">Craft</a>
+      <a href="#process" class="nav-link">Process</a>
+      <a href="#contact" class="nav-link">Contact</a>
+      <button id="theme-toggle" class="nav-link theme-toggle-btn" aria-label="Toggle theme">Dark</button>
+    </nav>
+  </header>
+
+  <!-- CANVAS WRAPPER (Hero) -->
+  <!-- We wrap it to allow GSAP ScrollTrigger to shrink it into a container -->
+  <section class="hero-section" id="hero">
+    <div class="canvas-wrapper" id="canvas-wrapper">
+      <canvas id="canvas" class="canvas"></canvas>
+      
+      <!-- Phase 5 UI Overlays specific to the canvas -->
+      <div class="ui-layer" id="config-overlay">
+        <!-- Config Panel -->
+        <div id="config-panel" class="config-panel"></div>
+        
+        <!-- Navigation Dots -->
+        <div id="nav-dots" class="nav-dots"></div>
+        
+        <!-- Price Display -->
+        <div class="price-display">
+          <div class="price-label">ESTIMATED TOTAL</div>
+          <div id="price-value" class="price-value">$12,500</div>
+          <button class="btn btn-order">REQUEST QUOTE</button>
+        </div>
+      </div>
+      
+      <!-- Overlay text in hero -->
+      <div class="hero-content pointer-events-none">
+        <h1>Discover your kitchen</h1>
+        <p>Bespoke architecture meets unparalleled craftsmanship.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHASE 6 TARGET SECTIONS (Landing Page) -->
+  
+  <section id="features" class="features-section pad-y">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="gsap-reveal-up">Three pillars of craft</h2>
+        <p class="gsap-reveal-up">We merge traditional carpentry with precise CNC manufacturing to create functional art.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card gsap-reveal-up">
+          <h3>Unmatched Materials</h3>
+          <p>We source only the finest sustainable European oak and Carrara marble, meticulously hand-selected for consistency.</p>
+        </div>
+        <div class="feature-card gsap-reveal-up" data-delay="0.1">
+          <h3>Precision Engineering</h3>
+          <p>Blum hardware and millimeter-perfect tolerances ensure a soft-close experience that lasts a lifetime.</p>
+        </div>
+        <div class="feature-card gsap-reveal-up" data-delay="0.2">
+          <h3>Sustainable Core</h3>
+          <p>Zero-VOC adhesives and sustainably harvested timber cores bring nature into your home without compromising it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="process" class="process-section pad-y bg-surface">
+    <div class="container">
+      <h2 class="text-center gsap-reveal-up">Our Process</h2>
+      <div class="timeline">
+        <div class="timeline-step gsap-reveal-up">
+          <div class="step-num">01</div>
+          <h3>Consultation</h3>
+          <p>Virtual or in-person architectural review.</p>
+        </div>
+        <div class="timeline-step gsap-reveal-up">
+          <div class="step-num">02</div>
+          <h3>Design</h3>
+          <p>Iterative 3D configuration tailored to your space.</p>
+        </div>
+        <div class="timeline-step gsap-reveal-up">
+          <div class="step-num">03</div>
+          <h3>Installation</h3>
+          <p>White-glove delivery and assembly by our masters.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="gallery" class="gallery-section pad-y">
+    <div class="container">
+      <h2 class="gsap-reveal-up">Inspiration Gallery</h2>
+      <div class="masonry-grid">
+        <img src="https://picsum.photos/seed/kitchen1/600/800" class="gsap-reveal-up" alt="Kitchen 1">
+        <img src="https://picsum.photos/seed/kitchen2/600/400" class="gsap-reveal-up" alt="Kitchen 2">
+        <img src="https://picsum.photos/seed/kitchen3/600/500" class="gsap-reveal-up" alt="Kitchen 3">
+        <img src="https://picsum.photos/seed/kitchen4/600/700" class="gsap-reveal-up" alt="Kitchen 4">
+        <img src="https://picsum.photos/seed/kitchen5/600/600" class="gsap-reveal-up" alt="Kitchen 5">
+        <img src="https://picsum.photos/seed/kitchen6/600/900" class="gsap-reveal-up" alt="Kitchen 6">
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="contact-section pad-y bg-surface">
+    <div class="container">
+      <div class="contact-wrap gsap-reveal-up">
+        <h2>Bring it to life</h2>
+        <form class="contact-form">
+          <div class="form-group">
+            <input type="text" placeholder="Full Name" required>
+          </div>
+          <div class="form-group">
+            <input type="email" placeholder="Email Address" required>
+          </div>
+          <div class="form-group">
+            <textarea placeholder="Tell us about your project..." rows="4"></textarea>
+          </div>
+          <button type="button" class="btn btn-order w-full">Request Consultation</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer pad-y text-center">
+    <p>&copy; 2026 Rossa Architecture. All rights reserved.</p>
+  </footer>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+{
+  "waypoints": [
+    {
+      "id":       "overview",
+      "label":    "Overview",
+      "icon":     "grid",
+      "position": [5.2,  3.8,  6.0],
+      "target":   [0.0,  1.0,  -1.0],
+      "fov":      45,
+      "duration": 1.8,
+      "ease":     "power3.inOut"
+    },
+    {
+      "id":       "island",
+      "label":    "Island",
+      "icon":     "island",
+      "position": [1.2,  1.9,  3.2],
+      "target":   [0.8,  0.9,  0.0],
+      "fov":      40,
+      "duration": 1.4,
+      "ease":     "power2.inOut"
+    },
+    {
+      "id":       "storage",
+      "label":    "Storage",
+      "icon":     "storage",
+      "position": [-1.0, 2.2,  1.5],
+      "target":   [-2.5, 1.2, -3.4],
+      "fov":      42,
+      "duration": 1.4,
+      "ease":     "power2.inOut"
+    },
+    {
+      "id":       "appliances",
+      "label":    "Appliances",
+      "icon":     "appliances",
+      "position": [4.8,  2.4,  1.8],
+      "target":   [3.5,  1.2, -3.4],
+      "fov":      38,
+      "duration": 1.4,
+      "ease":     "power2.inOut"
+    }
+  ]
+}

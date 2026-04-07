@@ -1,0 +1,6 @@
+[
+  { "id": "marble", "name": "Carrara Marble" },
+  { "id": "wood", "name": "European Oak" },
+  { "id": "concrete", "name": "Polished Concrete" },
+  { "id": "quartz", "name": "Snow Quartz" }
+]

@@ -1,0 +1,24 @@
+{
+  "basePrice": 12500,
+  "modifiers": {
+    "facade": {
+      "f_arctic": 0,
+      "f_sand": 0,
+      "f_clay": 350,
+      "f_sage": 400,
+      "f_navy": 450,
+      "f_charcoal": 500
+    },
+    "countertop": {
+      "marble": 2200,
+      "wood": 800,
+      "concrete": 1100,
+      "quartz": 1800
+    },
+    "handle": {
+      "chrome": 0,
+      "brass": 250,
+      "matte-black": 100
+    }
+  }
+}
