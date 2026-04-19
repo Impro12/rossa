@@ -3,15 +3,13 @@ import * as THREE from 'three';
 /**
  * ColorConfigurator
  * Centralized API for mutating materials across the kitchen meshes.
- * Emits global sync events when options change.
+ * Emits 'config:updated' events with { type, id, value } so PriceDisplay
+ * can look up the correct price modifier by id.
  */
 
 class ColorConfigurator {
   constructor(registry) {
     this.registry = registry;
-    this.textureLoader = new THREE.TextureLoader();
-
-    // Store shared material instances to save memory. We clone the default once per type locally if needed.
     this.sharedMaterials = {
       facade: null,
       countertop: null,
@@ -19,110 +17,88 @@ class ColorConfigurator {
     };
   }
 
-  changeFacadeColor(hexColor) {
-    console.log(`[Configurator] Changing facade color to ${hexColor}`);
-    
+  /**
+   * @param {string} hexColor  - CSS hex string e.g. '#dfd7c8'
+   * @param {string} colorId   - pricing key e.g. 'f_arctic'
+   */
+  changeFacadeColor(hexColor, colorId = null) {
     if (!this.sharedMaterials.facade) {
-       // We assume the first facade mesh has the default material we want to clone
-      if (this.registry.facades.length > 0) {
-        this.sharedMaterials.facade = this.registry.facades[0].material.clone();
-      } else {
-        this.sharedMaterials.facade = new THREE.MeshStandardMaterial({ roughness: 0.35, metalness: 0 });
-      }
+      const base = this.registry.facades[0]?.material;
+      this.sharedMaterials.facade = base
+        ? base.clone()
+        : new THREE.MeshStandardMaterial({ roughness: 0.4, metalness: 0 });
     }
-    
+
     this.sharedMaterials.facade.color.set(hexColor);
-    
-    // Apply shared material to all facade and drawer meshes
-    this.registry.facades.forEach(mesh => { mesh.material = this.sharedMaterials.facade; });
-    
-    // Some drawers might be separate meshes but acting as facades. 
-    // In our placeholder logic we gave the front plates the facade material.
-    // If the drawer root has a child named facade, handle it:
+
+    // Apply to all facade meshes
+    this.registry.facades.forEach(mesh => {
+      mesh.material = this.sharedMaterials.facade;
+    });
+
+    // Also recolor drawer fronts (children named 'facade_*')
     this.registry.drawers.forEach(drawer => {
       drawer.traverse(child => {
-        if (child.name.includes('facade') || child.name.includes('door')) {
+        if (child.isMesh && (child.name.includes('facade') || child.name.includes('door'))) {
           child.material = this.sharedMaterials.facade;
         }
       });
     });
 
-    this._dispatch('facade', hexColor);
+    this._dispatch('facade', colorId || hexColor);
   }
 
-  changeCountertopMaterial(materialId, diffuseUrl = null, normalUrl = null, roughnessUrl = null) {
-    console.log(`[Configurator] Changing countertop to ${materialId}`);
-
+  changeCountertopMaterial(materialId) {
     if (!this.sharedMaterials.countertop) {
-      if (this.registry.countertops.length > 0) {
-        this.sharedMaterials.countertop = this.registry.countertops[0].material.clone();
-      } else {
-        this.sharedMaterials.countertop = new THREE.MeshStandardMaterial();
-      }
+      const base = this.registry.countertops[0]?.material;
+      this.sharedMaterials.countertop = base
+        ? base.clone()
+        : new THREE.MeshStandardMaterial();
     }
 
-    // In a production app, we would load textures here.
-    // If no textures are provided, we just simulate the change with color for the stub.
-    if (!diffuseUrl) {
-      const stubColors = {
-        'marble': 0xece9e6,
-        'wood': 0x8b5a2b,
-        'concrete': 0x808080,
-        'quartz': 0xf8f8f8
-      };
-      this.sharedMaterials.countertop.color.setHex(stubColors[materialId] || 0xffffff);
-      if (materialId === 'wood') this.sharedMaterials.countertop.roughness = 0.6;
-      if (materialId === 'marble') this.sharedMaterials.countertop.roughness = 0.1;
-    } else {
-      // Async loading logic would go here
-    }
+    const mat = this.sharedMaterials.countertop;
+    const colors = {
+      marble:   { color: 0xece9e6, roughness: 0.08, metalness: 0.02 },
+      wood:     { color: 0x8b6343, roughness: 0.65, metalness: 0.0  },
+      concrete: { color: 0x7a7870, roughness: 0.75, metalness: 0.0  },
+      quartz:   { color: 0xf4f2ee, roughness: 0.12, metalness: 0.0  },
+    };
+    const cfg = colors[materialId] || colors.marble;
+    mat.color.setHex(cfg.color);
+    mat.roughness = cfg.roughness;
+    mat.metalness = cfg.metalness;
 
-    this.registry.countertops.forEach(mesh => { mesh.material = this.sharedMaterials.countertop; });
+    this.registry.countertops.forEach(mesh => { mesh.material = mat; });
 
     this._dispatch('countertop', materialId);
   }
 
   changeHandleFinish(finishId) {
-    console.log(`[Configurator] Changing handle finish to ${finishId}`);
-
     if (!this.sharedMaterials.handle) {
-      if (this.registry.handles.length > 0) {
-        this.sharedMaterials.handle = this.registry.handles[0].material.clone();
-      } else {
-        this.sharedMaterials.handle = new THREE.MeshStandardMaterial();
-      }
+      const base = this.registry.handles[0]?.material;
+      this.sharedMaterials.handle = base
+        ? base.clone()
+        : new THREE.MeshStandardMaterial();
     }
 
     const mat = this.sharedMaterials.handle;
-    
-    switch (finishId) {
-      case 'chrome':
-        mat.color.setHex(0xe8e8e8);
-        mat.roughness = 0.1;
-        mat.metalness = 0.9;
-        break;
-      case 'brass':
-        mat.color.setHex(0xcca352);
-        mat.roughness = 0.25;
-        mat.metalness = 0.85;
-        break;
-      case 'matte-black':
-        mat.color.setHex(0x1a1a1a);
-        mat.roughness = 0.8;
-        mat.metalness = 0.2;
-        break;
-    }
+    const finishes = {
+      chrome:       { color: 0xe0e0e0, roughness: 0.08, metalness: 0.95 },
+      brass:        { color: 0xc49b45, roughness: 0.20, metalness: 0.90 },
+      'matte-black':{ color: 0x1a1a1a, roughness: 0.80, metalness: 0.15 },
+    };
+    const cfg = finishes[finishId] || finishes.chrome;
+    mat.color.setHex(cfg.color);
+    mat.roughness = cfg.roughness;
+    mat.metalness = cfg.metalness;
 
-    this.registry.handles.forEach(mesh => { mesh.material = this.sharedMaterials.handle; });
+    this.registry.handles.forEach(mesh => { mesh.material = mat; });
 
     this._dispatch('handle', finishId);
   }
 
-  _dispatch(type, value) {
-    const event = new CustomEvent('config:updated', { 
-      detail: { type, value }
-    });
-    window.dispatchEvent(event);
+  _dispatch(type, id) {
+    window.dispatchEvent(new CustomEvent('config:updated', { detail: { type, id } }));
   }
 }
 

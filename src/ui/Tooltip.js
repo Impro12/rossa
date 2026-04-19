@@ -6,7 +6,7 @@ import EventBus from '../core/EventBus.js';
  * Tooltip — shows contextual labels near hovered 3D objects.
  */
 
-const _el = document.getElementById('tooltip');
+let _el = null;
 
 /** Maps mesh name prefix → human-readable label */
 const _labels = {
@@ -33,6 +33,7 @@ function _labelFor(meshName) {
 
 const Tooltip = {
   init() {
+    _el = document.getElementById('tooltip');
     if (!_el) return;
 
     EventBus.on('interact:hover', (e) => {
@@ -40,13 +41,13 @@ const Tooltip = {
       const label = _labelFor(name);
 
       if (label) {
-        Store.state.tooltipText = label;
-        gsap.to(_el, { opacity: 1, duration: 0.2 });
+        _el.textContent = label;
+        gsap.to(_el, { autoAlpha: 1, duration: 0.2 });
       } else {
         gsap.to(_el, {
-          opacity: 0,
+          autoAlpha: 0,
           duration: 0.15,
-          onComplete: () => { Store.state.tooltipText = ''; },
+          onComplete: () => { _el.textContent = ''; },
         });
       }
     });

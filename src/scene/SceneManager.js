@@ -13,20 +13,20 @@ class SceneManager {
       canvas,
       antialias: true,
       alpha: false,
-      powerPreference: 'high-performance'
+      powerPreference: 'high-performance',
+      stencil: false,
     });
 
-    // Device Pixel Ratio capped at 2 for performance scaling
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); // cap at 1.5 not 2
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.0;
     this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.shadowMap.type = THREE.PCFShadowMap; // faster than PCFSoft
 
     // 2. Initialise Scene
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x1e1c19); // Dark room (replaced by env HDRI)
+    this.scene.background = new THREE.Color(0xeae6e0); // matches wall_back in procedural scene
 
     // 3. Initialise Camera
     this.camera = new THREE.PerspectiveCamera(
@@ -42,6 +42,8 @@ class SceneManager {
     this.clock = new THREE.Clock();
     this._updateCallbacks = new Set();
     this._rafId = null;
+    this._renderFrames = 0;
+    this._tickCount = 0;
 
     // Bind resize handler
     this._onResize = this._onResize.bind(this);
@@ -77,20 +79,29 @@ class SceneManager {
     }
   }
 
+  /** Call this whenever something changes and a new frame is needed. */
+  requestRender(frames = 2) {
+    this._renderFrames = Math.max(this._renderFrames, frames);
+  }
+
   _tick = () => {
     this._rafId = requestAnimationFrame(this._tick);
-    
-    // Calculate delta and elapsed time
+    this._tickCount++;
+
     const delta = this.clock.getDelta();
     const elapsed = this.clock.getElapsedTime();
 
-    // Fire all update callbacks
     for (const callback of this._updateCallbacks) {
       callback(delta, elapsed);
     }
 
-    // Render the frame
-    this.renderer.render(this.scene, this.camera);
+    // On-demand at full rate, plus a 10 fps fallback so the scene never goes blank
+    const onDemand = this._renderFrames > 0;
+    const fallback  = this._tickCount % 6 === 0; // every 6th frame ≈ 10 fps
+    if (onDemand || fallback) {
+      if (onDemand) this._renderFrames--;
+      this.renderer.render(this.scene, this.camera);
+    }
   };
 
   _onResize() {

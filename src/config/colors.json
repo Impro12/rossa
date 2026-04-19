@@ -1,8 +1,8 @@
 [
-  { "id": "f_arctic", "name": "Arctic White", "hex": "#f2f2f0" },
-  { "id": "f_sand", "name": "Desert Sand", "hex": "#dfd7c8" },
-  { "id": "f_clay", "name": "Warm Clay", "hex": "#bfa286" },
-  { "id": "f_sage", "name": "Sage Green", "hex": "#8ba391" },
-  { "id": "f_navy", "name": "Midnight Navy", "hex": "#2a3b4c" },
-  { "id": "f_charcoal", "name": "Deep Charcoal", "hex": "#1a1a18" }
+  { "id": "f_arctic",   "name": "Arctic White",   "hex": "#f2f2f0", "roughness": 0.35, "metalness": 0.0, "priceDelta": 0   },
+  { "id": "f_sand",     "name": "Desert Sand",     "hex": "#dfd7c8", "roughness": 0.40, "metalness": 0.0, "priceDelta": 0   },
+  { "id": "f_clay",     "name": "Warm Clay",       "hex": "#bfa286", "roughness": 0.45, "metalness": 0.0, "priceDelta": 350 },
+  { "id": "f_sage",     "name": "Sage Green",      "hex": "#8ba391", "roughness": 0.40, "metalness": 0.0, "priceDelta": 400 },
+  { "id": "f_navy",     "name": "Midnight Navy",   "hex": "#2a3b4c", "roughness": 0.30, "metalness": 0.0, "priceDelta": 450 },
+  { "id": "f_charcoal", "name": "Deep Charcoal",   "hex": "#1a1a18", "roughness": 0.25, "metalness": 0.0, "priceDelta": 500 }
 ]

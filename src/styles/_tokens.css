@@ -91,6 +91,14 @@
 
   /* ── Glassmorphism ───────────────────────────────────── */
   --glass-bg:     rgba(20, 17, 13, 0.75);
-  --glass-blur:   blur(20px) saturate(150%);
+  --glass-blur:   blur(10px) saturate(130%);
   --glass-border: 1px solid rgba(255, 248, 236, 0.08);
+
+  /* ── Extended UI tokens ──────────────────────────────── */
+  --color-text-subtle:  rgba(247, 244, 239, 0.35);
+  --color-accent-dim:   rgba(196, 168, 130, 0.12);
+  --color-accent-glow:  rgba(196, 168, 130, 0.30);
+  --color-surface-3:    #353530;
+  --color-border-hover: rgba(255, 248, 236, 0.20);
+  --color-black:        #1A1A18;
 }

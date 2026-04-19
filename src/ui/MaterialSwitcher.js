@@ -31,11 +31,16 @@ function _renderCountertops(countertops) {
     btn.setAttribute('aria-label', ct.name);
     btn.setAttribute('title', ct.description || ct.name);
 
-    // Colour preview (gradient placeholder until thumbnail loads)
-    const colors = { marble: '#dbd7d2', wood: '#8b6914', concrete: '#9a9a99', quartz: '#e5e0da' };
+    // Colour preview gradients — realistic stand-ins until real textures load
+    const gradients = {
+      marble:   'linear-gradient(135deg, #f0ede8 0%, #e8e4de 30%, #dbd7d2 55%, #e4e0da 75%, #f2efea 100%)',
+      wood:     'linear-gradient(160deg, #c8a96e 0%, #b8925a 20%, #c9a46a 40%, #a07840 60%, #b89058 80%, #c4a060 100%)',
+      concrete: 'linear-gradient(135deg, #8e8e8e 0%, #9a9a99 40%, #838383 70%, #929292 100%)',
+      quartz:   'linear-gradient(135deg, #f5f2ee 0%, #ede9e3 40%, #f8f5f0 70%, #eae6e0 100%)',
+    };
     const thumb = document.createElement('div');
     thumb.className = 'mat-thumb';
-    thumb.style.background = colors[ct.id] ?? '#ccc';
+    thumb.style.background = gradients[ct.id] ?? '#ccc';
     if (ct.thumbnail) {
       const img = new Image();
       img.src = ct.thumbnail;
@@ -51,7 +56,7 @@ function _renderCountertops(countertops) {
 
     const price = document.createElement('span');
     price.className = 'mat-price';
-    price.textContent = ct.priceDelta > 0 ? `+€${ct.priceDelta.toLocaleString()}` : 'Included';
+    price.textContent = ct.priceDelta > 0 ? `+$${ct.priceDelta.toLocaleString()}` : 'Included';
 
     info.append(name, price);
     btn.append(thumb, info);
@@ -82,7 +87,7 @@ function _renderHandles(handles) {
 
     const price = document.createElement('span');
     price.className = 'handle-price';
-    price.textContent = h.priceDelta > 0 ? `+€${h.priceDelta}` : 'Included';
+    price.textContent = h.priceDelta > 0 ? `+$${h.priceDelta}` : 'Included';
 
     btn.append(dot, name, price);
     btn.addEventListener('click', () => {

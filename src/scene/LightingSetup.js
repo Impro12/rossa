@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
-import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 /**
@@ -19,53 +18,32 @@ class LightingSetup {
     this.scene = scene;
     this.renderer = renderer;
 
-    // Required for RectAreaLight to look correct with PBR
-    RectAreaLightUniformsLib.init();
-
     this._createLights();
     this._loadHDRI();
   }
 
   _createLights() {
-    // 1. Hemisphere Light (Soft ambient GI fallback)
-    // Sky: Warm white, Ground: Deep Charcoal
-    this.hemiLight = new THREE.HemisphereLight(0xfffaec, 0x1A1A18, 0.4);
-    this.scene.add(this.hemiLight);
+    // Hemisphere — warm sky, cool ground
+    this.scene.add(new THREE.HemisphereLight(0xfffaec, 0x2a2a28, 0.6));
 
-    // 2. SpotLight (Focal accent, soft shadow caster)
-    // Placed slightly off-center to cast dramatic angled shadows from the island
-    this.spotLight = new THREE.SpotLight(0xfff5e6, 40); // Intensity drops with distance in physically correct mode
-    this.spotLight.position.set(4, 5, 4);
-    this.spotLight.angle = Math.PI / 4;
-    this.spotLight.penumbra = 0.5;
-    this.spotLight.decay = 1.5;
-    this.spotLight.distance = 20;
+    // Key directional light with shadow (1024 map is plenty for geometry this simple)
+    const key = new THREE.DirectionalLight(0xfff5e6, 1.8);
+    key.position.set(4, 8, 5);
+    key.castShadow = true;
+    key.shadow.mapSize.set(1024, 1024);
+    key.shadow.camera.left   = -6;
+    key.shadow.camera.right  =  6;
+    key.shadow.camera.top    =  6;
+    key.shadow.camera.bottom = -6;
+    key.shadow.camera.near   = 1;
+    key.shadow.camera.far    = 20;
+    key.shadow.bias = -0.001;
+    this.scene.add(key);
 
-    // Enable soft shadows
-    this.spotLight.castShadow = true;
-    this.spotLight.shadow.mapSize.width = 2048;
-    this.spotLight.shadow.mapSize.height = 2048;
-    this.spotLight.shadow.camera.near = 1;
-    this.spotLight.shadow.camera.far = 15;
-    this.spotLight.shadow.bias = -0.0001; // prevent shadow acne
-    
-    this.scene.add(this.spotLight);
-
-    // 3. RectAreaLights (Warm 3000K, above countertop glow)
-    const rectLightColor = 0xffeacc; // ~3000k warm
-    const rectLightIntensity = 2.5;
-    
-    // Left countertop downlight
-    this.rectLightLeft = new THREE.RectAreaLight(rectLightColor, rectLightIntensity, 2, 0.5);
-    this.rectLightLeft.position.set(-2, 2.8, -1.8);
-    this.rectLightLeft.lookAt(-2, 0, -1.8);
-    this.scene.add(this.rectLightLeft);
-
-    // Right countertop downlight
-    this.rectLightRight = new THREE.RectAreaLight(rectLightColor, rectLightIntensity, 2, 0.5);
-    this.rectLightRight.position.set(2, 2.8, -1.8);
-    this.rectLightRight.lookAt(2, 0, -1.8);
-    this.scene.add(this.rectLightRight);
+    // Cheap fill from opposite side — replaces the two RectAreaLights
+    const fill = new THREE.DirectionalLight(0xffeacc, 0.5);
+    fill.position.set(-3, 4, -2);
+    this.scene.add(fill);
   }
 
   async _loadHDRI() {

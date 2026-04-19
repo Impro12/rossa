@@ -3,11 +3,11 @@
 .panel {
   position: absolute;
   right: var(--space-6);
-  top: 50%;
-  transform: translateY(-50%);
+  top: 88px;       /* below the fixed header */
+  bottom: 110px;   /* above the bottom toolbar */
   z-index: var(--z-panel);
+  pointer-events: auto;
   width: 280px;
-  max-height: calc(100vh - 160px);
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--color-border) transparent;
@@ -17,7 +17,7 @@
   border: var(--glass-border);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
-  padding: var(--space-6);
+  padding: var(--space-5);
   animation: slideInRight 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
@@ -236,3 +236,74 @@
   font-size: var(--text-xs);
   color: var(--color-text-subtle);
 }
+
+/* ── Panels Mobile Responsive ─────────────────────────── */
+@media (max-width: 768px) {
+  .panel {
+    right: var(--space-3);
+    left: var(--space-3);
+    top: auto;
+    bottom: var(--space-3);
+    transform: none;
+    width: auto;
+    max-height: 45vh;
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    animation: slideInUp 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+
+  .panel-title {
+    font-size: var(--text-base);
+  }
+
+  .swatch-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-1);
+  }
+  .swatch-dot {
+    width: 28px;
+    height: 28px;
+  }
+  .swatch-name { font-size: 9px; }
+
+  .mat-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-1);
+  }
+  .mat-thumb { height: 48px; }
+  .mat-name { font-size: 11px; }
+
+  .handle-chip {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-xs);
+  }
+}
+
+@media (max-width: 480px) {
+  .panel {
+    right: var(--space-2);
+    left: var(--space-2);
+    bottom: var(--space-2);
+    max-height: 40vh;
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+  }
+
+  .swatch-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .swatch-dot {
+    width: 24px;
+    height: 24px;
+  }
+
+  .mat-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+

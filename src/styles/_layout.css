@@ -1,11 +1,5 @@
 /* ── _layout.css ── canvas, app shell, header, overlay grid */
 
-html, body {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
 .app {
   position: fixed;
   inset: 0;
@@ -24,7 +18,7 @@ html, body {
 
 /* ── Header ──────────────────────────────────────────── */
 .header {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
@@ -41,7 +35,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  color: var(--color-text);
+  color: var(--color-warm-white);
   pointer-events: auto;
   letter-spacing: 0.18em;
   font-size: var(--text-sm);
@@ -58,11 +52,11 @@ html, body {
 }
 .nav-link {
   font-size: var(--text-sm);
-  color: var(--color-text-muted);
+  color: rgba(247, 244, 239, 0.85);
   letter-spacing: 0.06em;
   transition: color var(--transition-base);
 }
-.nav-link:hover { color: var(--color-text); }
+.nav-link:hover { color: var(--color-warm-gold); }
 
 /* ── Gradient vignette at bottom ──────────────────────── */
 .app::after {
@@ -93,3 +87,120 @@ html, body {
   pointer-events: none;
   animation: fadeInUp 1s 2s both;
 }
+
+/* ── Hamburger Toggle ─────────────────────────────────── */
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 32px;
+  height: 32px;
+  padding: 4px;
+  pointer-events: auto;
+  z-index: calc(var(--z-header) + 1);
+}
+.nav-toggle-bar {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--color-text);
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.nav-toggle.active .nav-toggle-bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.nav-toggle.active .nav-toggle-bar:nth-child(2) {
+  opacity: 0;
+}
+.nav-toggle.active .nav-toggle-bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ── Layout Mobile Responsive ─────────────────────────── */
+@media (max-width: 768px) {
+  .nav-toggle {
+    display: flex;
+  }
+
+  .header {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .header-nav {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 0;
+    background: rgba(10, 8, 6, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 248, 236, 0.08);
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.3s ease,
+                padding 0.3s ease;
+  }
+  .header-nav.nav-open {
+    max-height: 300px;
+    opacity: 1;
+    padding: var(--space-4) 0;
+    pointer-events: auto;
+  }
+
+  .nav-link {
+    display: block;
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--text-sm);
+    border-bottom: 1px solid rgba(255, 248, 236, 0.05);
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .nav-link:hover {
+    background: rgba(255, 248, 236, 0.06);
+  }
+  .nav-link:last-child {
+    border-bottom: none;
+  }
+
+  .theme-toggle-btn {
+    text-align: left;
+    border: none;
+    border-radius: 0;
+    padding: var(--space-3) var(--space-6);
+  }
+
+  .app::after {
+    height: 120px;
+  }
+  .interact-hint {
+    bottom: 80px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: var(--space-2) var(--space-3);
+  }
+  .nav-link {
+    padding: var(--space-3) var(--space-4);
+  }
+  .theme-toggle-btn {
+    padding: var(--space-3) var(--space-4);
+  }
+  .app::after {
+    height: 80px;
+  }
+  .interact-hint {
+    bottom: 60px;
+  }
+}
+

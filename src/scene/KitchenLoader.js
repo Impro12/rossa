@@ -89,12 +89,11 @@ class KitchenLoader {
           this.registry.facades.push(child);
           child.material = this.defaultMaterials.facade;
         } 
-        else if (name.includes('drawer')) {
+        else if (name.includes('drawer') && !name.includes('facade')) {
+          // Only register the drawer BODY (not the facade front child named 'facade_drawer_*')
           this.registry.drawers.push(child);
-          // For the placeholder we assume the drawer front is the facade, 
-          // but just to be safe we assign it the facade mat as well.
-          child.material = this.defaultMaterials.facade;
-        } 
+          child.material = this.defaultMaterials.drawerBody;
+        }
         else if (name.includes('countertop')) {
           this.registry.countertops.push(child);
           child.material = this.defaultMaterials.countertop;

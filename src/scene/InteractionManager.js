@@ -16,6 +16,13 @@ let _enabled = true;
 let _interactiveTargets = [];
 let _lastHovered = null;
 
+let _pointerDown    = false;
+let _pointerMoved   = false;
+let _pointerStartX  = 0;
+let _pointerStartY  = 0;
+let _pointerDirty   = false; // true when pointer moved since last raycast
+const _DRAG_THRESHOLD = 5;
+
 const InteractionManager = {
   /**
    * @param {THREE.PerspectiveCamera} camera
@@ -25,11 +32,10 @@ const InteractionManager = {
     _camera = camera;
 
     domElement.addEventListener('pointermove', _onMove);
+    domElement.addEventListener('pointerdown', _onPointerDown);
+    domElement.addEventListener('pointerup',   _onPointerUp);
     domElement.addEventListener('click',       _onClick);
-    domElement.addEventListener('pointerdown', () => { _pointerDown = true; });
-    domElement.addEventListener('pointerup',   () => { _pointerDown = false; });
 
-    // Update target list when model is ready
     _refreshTargets();
   },
 
@@ -47,7 +53,8 @@ const InteractionManager = {
    * Call each frame from Ticker to update raycasting.
    */
   update() {
-    if (!_camera || !_enabled || !_interactiveTargets.length) return;
+    if (!_camera || !_enabled || !_interactiveTargets.length || !_pointerDirty) return;
+    _pointerDirty = false;
 
     _raycaster.setFromCamera(_pointer, _camera);
     const hits = _raycaster.intersectObjects(_interactiveTargets, false);
@@ -64,27 +71,33 @@ const InteractionManager = {
   },
 };
 
-let _pointerDown = false;
-let _pointerMoved = false;
-let _pointerStartX = 0;
-let _pointerStartY = 0;
-
 function _onMove(e) {
   _pointer.x =  (e.clientX / innerWidth)  * 2 - 1;
   _pointer.y = -(e.clientY / innerHeight) * 2 + 1;
+  _pointerDirty = true;
 
-  const dx = e.clientX - _pointerStartX;
-  const dy = e.clientY - _pointerStartY;
-  if (Math.hypot(dx, dy) > 4) _pointerMoved = true;
+  if (_pointerDown) {
+    const dx = e.clientX - _pointerStartX;
+    const dy = e.clientY - _pointerStartY;
+    if (Math.hypot(dx, dy) > _DRAG_THRESHOLD) _pointerMoved = true;
+  }
 }
 
-function _onClick(e) {
-  if (_pointerMoved) { _pointerMoved = false; return; } // ignore drags
+function _onPointerDown(e) {
+  _pointerDown   = true;
+  _pointerMoved  = false;
   _pointerStartX = e.clientX;
   _pointerStartY = e.clientY;
-  _pointerMoved = false;
+}
 
+function _onPointerUp() {
+  _pointerDown = false;
+}
+
+function _onClick() {
+  if (_pointerMoved) return; // treat as drag, not a click
   if (!_camera || !_enabled) return;
+
   _raycaster.setFromCamera(_pointer, _camera);
   const hits = _raycaster.intersectObjects(_interactiveTargets, false);
   if (hits.length > 0) {
@@ -93,7 +106,6 @@ function _onClick(e) {
 }
 
 function _refreshTargets() {
-  // Called after model is ready
   setTimeout(() => {
     _interactiveTargets = KitchenModel.getInteractiveMeshes();
   }, 500);

@@ -18,7 +18,7 @@ const ColorPicker = {
       const btn = document.createElement('button');
       btn.id = `swatch-${color.id}`;
       btn.className = 'swatch';
-      btn.setAttribute('aria-label', `${color.name}${color.priceDelta ? ` (+€${color.priceDelta})` : ''}`);
+      btn.setAttribute('aria-label', `${color.name}${color.priceDelta ? ` (+$${color.priceDelta})` : ''}`);
       btn.setAttribute('title', color.name);
       btn.style.setProperty('--swatch-color', color.hex);
 
@@ -32,7 +32,7 @@ const ColorPicker = {
 
       const price = document.createElement('span');
       price.className = 'swatch-price';
-      price.textContent = color.priceDelta > 0 ? `+€${color.priceDelta.toLocaleString()}` : 'Included';
+      price.textContent = color.priceDelta > 0 ? `+$${color.priceDelta.toLocaleString()}` : 'Included';
 
       btn.append(dot, name, price);
       btn.addEventListener('click', () => {

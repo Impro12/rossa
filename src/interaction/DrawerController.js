@@ -4,7 +4,7 @@ import { gsap } from 'gsap';
 /**
  * DrawerController
  * Handles opening and closing of drawer meshes via pointer clicks and keyboard inputs.
- * Ensures animations do not stack.
+ * Uses getBoundingClientRect for accurate raycasting regardless of canvas size/position.
  */
 
 class DrawerController {
@@ -16,54 +16,46 @@ class DrawerController {
     this.raycaster = new THREE.Raycaster();
     this.pointer = new THREE.Vector2();
 
-    // Track state of each drawer
-    this.drawerStates = new Map(); // mesh -> { isOpen: false, isAnimating: false }
-    
-    // Keyboard accessibility state
-    this.focusIndex = -1; // index in this.drawers
+    this.drawerStates = new Map(); // mesh -> { isOpen, isAnimating }
+    this.focusIndex = -1;
 
     this._onPointerDown = this._onPointerDown.bind(this);
     this._onPointerUp = this._onPointerUp.bind(this);
     this._onKeyDown = this._onKeyDown.bind(this);
 
-    this.pointerDownTime = 0;
+    this.pointerDownPos = { x: 0, y: 0 };
 
-    // Attach listeners
     this.canvas.addEventListener('pointerdown', this._onPointerDown);
     this.canvas.addEventListener('pointerup', this._onPointerUp);
     window.addEventListener('keydown', this._onKeyDown);
   }
 
-  _onPointerDown() {
-    this.pointerDownTime = performance.now();
+  _onPointerDown(event) {
+    this.pointerDownPos = { x: event.clientX, y: event.clientY };
   }
 
   _onPointerUp(event) {
-    // Discriminate between click and drag (OrbitControls)
-    if (performance.now() - this.pointerDownTime > 250) return;
+    // Ignore if pointer moved > 5px (drag, not click)
+    const dx = event.clientX - this.pointerDownPos.x;
+    const dy = event.clientY - this.pointerDownPos.y;
+    if (Math.sqrt(dx * dx + dy * dy) > 5) return;
 
-    this.pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-    this.pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    // Use getBoundingClientRect for accurate NDC coords
+    const rect = this.canvas.getBoundingClientRect();
+    this.pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    this.pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
     this.raycaster.setFromCamera(this.pointer, this.camera);
-
     const intersects = this.raycaster.intersectObjects(this.drawers, true);
-    
-    if (intersects.length > 0) {
-      // Find the root drawer group/mesh that is stored in the registry
-      let intersectedGroup = intersects[0].object;
-      
-      // Traverse up to find the object that's actually in our drawers array
-      while (intersectedGroup && !this.drawers.includes(intersectedGroup)) {
-        if (intersectedGroup.parent) {
-          intersectedGroup = intersectedGroup.parent;
-        } else {
-          break;
-        }
-      }
 
-      if (this.drawers.includes(intersectedGroup)) {
-        this.toggleDrawer(intersectedGroup);
+    if (intersects.length > 0) {
+      // Walk up until we find the registered drawer root
+      let target = intersects[0].object;
+      while (target && !this.drawers.includes(target)) {
+        target = target.parent;
+      }
+      if (target && this.drawers.includes(target)) {
+        this.toggleDrawer(target);
       }
     }
   }
@@ -73,19 +65,13 @@ class DrawerController {
 
     if (event.key === 'Tab') {
       event.preventDefault();
-      // Cycle focus
       if (event.shiftKey) {
         this.focusIndex = this.focusIndex <= 0 ? this.drawers.length - 1 : this.focusIndex - 1;
       } else {
         this.focusIndex = this.focusIndex >= this.drawers.length - 1 ? 0 : this.focusIndex + 1;
       }
-      
-      // We could add a visual focus state here, but for now we just track it.
-      // E.g., emitting an event that HoverHighlight listens to.
-      const focusedDrawer = this.drawers[this.focusIndex];
-      const customEvent = new CustomEvent('drawer:focused', { detail: { mesh: focusedDrawer }});
-      window.dispatchEvent(customEvent);
-
+      const focused = this.drawers[this.focusIndex];
+      window.dispatchEvent(new CustomEvent('drawer:focused', { detail: { mesh: focused } }));
     } else if (event.key === ' ' || event.key === 'Enter') {
       if (this.focusIndex >= 0 && this.focusIndex < this.drawers.length) {
         event.preventDefault();
@@ -96,36 +82,31 @@ class DrawerController {
 
   toggleDrawer(drawerMesh) {
     if (!this.drawerStates.has(drawerMesh)) {
-       // Start strictly closed
       this.drawerStates.set(drawerMesh, { isOpen: false, isAnimating: false });
     }
 
     const state = this.drawerStates.get(drawerMesh);
-    
-    // Prevent animation stacking
     if (state.isAnimating) return;
 
-    state.isAnimating = true;
-    const targetZ = state.isOpen ? 0 : 0.35; // Slide out 35cm
-    
-    gsap.to(drawerMesh.position, {
-      z: drawerMesh.userData.originalZ !== undefined ? drawerMesh.userData.originalZ + targetZ : drawerMesh.position.z + (state.isOpen ? -0.35 : 0.35),
-      duration: 0.55,
-      ease: "power2.out",
-      onComplete: () => {
-        state.isOpen = !state.isOpen;
-        state.isAnimating = false;
-        
-        if (drawerMesh.userData.originalZ === undefined && targetZ > 0) {
-           drawerMesh.userData.originalZ = drawerMesh.position.z - 0.35;
-        }
-      }
-    });
-
-    // If it's the first time animating and originalZ isn't cached
+    // Store original Z once
     if (drawerMesh.userData.originalZ === undefined) {
       drawerMesh.userData.originalZ = drawerMesh.position.z;
     }
+
+    state.isAnimating = true;
+    const targetZ = state.isOpen
+      ? drawerMesh.userData.originalZ
+      : drawerMesh.userData.originalZ + 0.35;
+
+    gsap.to(drawerMesh.position, {
+      z: targetZ,
+      duration: 0.55,
+      ease: 'power2.out',
+      onComplete: () => {
+        state.isOpen = !state.isOpen;
+        state.isAnimating = false;
+      }
+    });
   }
 
   destroy() {

@@ -1,140 +1,123 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { gsap } from 'gsap';
+import EventBus from '../core/EventBus.js';
+import Store from '../core/Store.js';
+import waypointsData from '../config/camera-waypoints.json';
 
 /**
- * CameraRig
- * Wraps PerspectiveCamera and OrbitControls. Provides smooth GSAP-driven
- * transitions between predefined waypoints.
+ * CameraRig — wraps PerspectiveCamera + OrbitControls.
+ * Waypoints are loaded from camera-waypoints.json.
+ * Listens to EventBus 'camera:goto' and emits 'camera:arrived'.
  */
 
-// Define standard waypoints for the kitchen layout
-const WAYPOINTS = {
-  overview: {
-    position: new THREE.Vector3(0, 1.8, 6.5),
-    target: new THREE.Vector3(0, 1.0, 0),
-  },
-  island: {
-    position: new THREE.Vector3(-1.8, 1.4, 2.5),
-    target: new THREE.Vector3(0.5, 0.9, 0),
-  },
-  storage: {
-    position: new THREE.Vector3(-3.5, 1.6, 2.5),
-    target: new THREE.Vector3(-1.8, 1.2, -1.0),
-  },
-  detail: {
-    position: new THREE.Vector3(2.5, 1.4, 2.0),
-    target: new THREE.Vector3(1.2, 0.9, -1.5),
-  }
-};
+const WAYPOINTS = {};
+for (const wp of waypointsData.waypoints) {
+  WAYPOINTS[wp.id] = {
+    position: new THREE.Vector3(...wp.position),
+    target:   new THREE.Vector3(...wp.target),
+    fov:      wp.fov,
+    duration: wp.duration,
+    ease:     wp.ease,
+  };
+}
 
 class CameraRig {
   /**
-   * @param {THREE.PerspectiveCamera} camera 
-   * @param {HTMLCanvasElement} canvas 
+   * @param {THREE.PerspectiveCamera} camera
+   * @param {HTMLCanvasElement} canvas
    */
-  constructor(camera, canvas) {
+  constructor(camera, canvas, sceneManager) {
     this.camera = camera;
-    
-    // Initialise OrbitControls
+    this._sceneManager = sceneManager;
+
     this.controls = new OrbitControls(this.camera, canvas);
-    this.controls.enableDamping = true;
-    this.controls.dampingFactor = 0.05;
-    
-    // Constraints to prevent clipping below floor or behind walls
-    this.controls.minDistance = 1.5;
-    this.controls.maxDistance = 10;
-    
-    // Limit polar (vertical) angles: don't go under floor or perfectly top-down
-    this.controls.maxPolarAngle = Math.PI / 2 - 0.05; // 0.05 rad above horizon
-    this.controls.minPolarAngle = Math.PI / 6;        // 30deg from top
-    
-    // Optional: limit azimuth (horizontal) to keep user mostly in front of the kitchen
-    this.controls.minAzimuthAngle = -Math.PI / 1.5;
-    this.controls.maxAzimuthAngle = Math.PI / 1.5;
+    this.controls.enableDamping  = true;
+    this.controls.dampingFactor  = 0.05;
+    this.controls.enableZoom     = false; // wheel scroll goes to page, not camera zoom
+    this.controls.minDistance    = 2;
+    this.controls.maxDistance    = 8;
+    // Vertical: between 40° (slight top-down) and 78° (near-horizon)
+    this.controls.minPolarAngle  = Math.PI * 0.22;   // ~40°
+    this.controls.maxPolarAngle  = Math.PI * 0.43;   // ~78°
+    // Horizontal: ±80° — enough to see both ends of the run + island, never behind the walls
+    this.controls.minAzimuthAngle = -Math.PI * 0.44;
+    this.controls.maxAzimuthAngle =  Math.PI * 0.44;
 
-    // Track active tween to allow cancellation
+    // Re-render whenever the user drags the camera
+    this.controls.addEventListener('change', () => sceneManager?.requestRender(3));
+
     this._currentTween = null;
-    
-    // Automatically fly to overview on startup
-    this.camera.position.copy(WAYPOINTS.overview.position);
-    this.controls.target.copy(WAYPOINTS.overview.target);
+
+    // Start at overview
+    const start = WAYPOINTS.overview;
+    this.camera.position.copy(start.position);
+    this.camera.fov = start.fov;
+    this.camera.updateProjectionMatrix();
+    this.controls.target.copy(start.target);
     this.controls.update();
+
+    // Listen for navigation requests from Toolbar / NavigationDots
+    EventBus.on('camera:goto', (e) => this.flyTo(e.detail.waypoint));
+
+    // Announce initial waypoint
+    Store.state.activeWaypoint = 'overview';
   }
 
-  /**
-   * Must be called inside the main render loop to calculate damping
-   */
   update() {
-    if (this.controls.enabled) {
-      this.controls.update();
-    }
+    if (this.controls.enabled) this.controls.update();
   }
 
-  /**
-   * Disable manual orbiting (useful during dragging UI or animations)
-   */
-  enableOrbit() {
-    this.controls.enabled = true;
-  }
+  enableOrbit()  { this.controls.enabled = true; }
+  disableOrbit() { this.controls.enabled = false; }
 
   /**
-   * Disable manual orbiting
-   */
-  disableOrbit() {
-    this.controls.enabled = false;
-  }
-
-  /**
-   * Smoothly transitions the camera position and the OrbitControls target
-   * using a GSAP timeline.
-   * 
-   * @param {string} waypointName - 'overview' | 'island' | 'storage' | 'detail'
-   * @returns {Promise<void>} Resolves when animation completes
+   * Smoothly fly to a named waypoint.
+   * @param {string} waypointName
+   * @returns {Promise<void>}
    */
   flyTo(waypointName) {
     const waypoint = WAYPOINTS[waypointName];
     if (!waypoint) {
-      console.warn(`[CameraRig] Waypoint '${waypointName}' not found.`);
+      console.warn(`[CameraRig] Unknown waypoint: '${waypointName}'`);
       return Promise.resolve();
     }
 
-    if (this._currentTween) {
-      this._currentTween.kill();
-    }
+    this._currentTween?.kill();
+    this.disableOrbit();
 
     return new Promise((resolve) => {
-      // We animate both the camera position and the orbit target simultaneously.
-      // We disable controls during animation to prevent user interruption clashes.
-      this.disableOrbit();
-
       this._currentTween = gsap.timeline({
         onComplete: () => {
           this.enableOrbit();
+          Store.state.activeWaypoint = waypointName;
+          EventBus.emit('camera:arrived', { waypoint: waypointName });
           resolve();
-        }
+        },
       });
 
-      // Animate Camera Position
       this._currentTween.to(this.camera.position, {
         x: waypoint.position.x,
         y: waypoint.position.y,
         z: waypoint.position.z,
-        duration: 1.5,
-        ease: "power3.inOut"
+        duration: waypoint.duration,
+        ease: waypoint.ease,
       }, 0);
 
-      // Animate Orbit Controls Target
       this._currentTween.to(this.controls.target, {
         x: waypoint.target.x,
         y: waypoint.target.y,
         z: waypoint.target.z,
-        duration: 1.5,
-        ease: "power3.inOut",
-        onUpdate: () => {
-          // Keep the camera looking at the target while it's moving
-          this.camera.lookAt(this.controls.target);
-        }
+        duration: waypoint.duration,
+        ease: waypoint.ease,
+        onUpdate: () => this.camera.lookAt(this.controls.target),
+      }, 0);
+
+      this._currentTween.to(this.camera, {
+        fov: waypoint.fov,
+        duration: waypoint.duration,
+        ease: waypoint.ease,
+        onUpdate: () => this.camera.updateProjectionMatrix(),
       }, 0);
     });
   }

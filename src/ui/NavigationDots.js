@@ -1,20 +1,24 @@
+import EventBus from '../core/EventBus.js';
+import Store from '../core/Store.js';
+
 /**
- * NavigationDots
- * Controls camera waypoints (overview, island, storage, detail).
+ * NavigationDots — side dot navigation for camera waypoints.
+ * Communicates via EventBus; no direct CameraRig dependency.
  */
 
+const WAYPOINTS = ['overview', 'island', 'storage', 'appliances'];
+
 class NavigationDots {
-  constructor(cameraRig) {
-    this.cameraRig = cameraRig;
+  constructor() {
     this.container = document.getElementById('nav-dots');
-    
-    // The waypoints match CameraRig constants
-    this.waypoints = ['overview', 'island', 'storage', 'detail'];
     this._buildUI();
+
+    // Keep dots in sync with camera position changes
+    Store.subscribe('activeWaypoint', (wp) => this._setActive(wp));
   }
 
   _buildUI() {
-    this.container.innerHTML = this.waypoints.map((wp, i) => `
+    this.container.innerHTML = WAYPOINTS.map((wp, i) => `
       <button class="nav-dot ${i === 0 ? 'active' : ''}" data-waypoint="${wp}" aria-label="Go to ${wp} view">
         <span class="dot"></span>
         <span class="label">${wp}</span>
@@ -24,15 +28,13 @@ class NavigationDots {
     this.container.addEventListener('click', (e) => {
       const btn = e.target.closest('button');
       if (!btn) return;
-      
-      const waypoint = btn.dataset.waypoint;
-      
-      // Update active state
-      this.container.querySelectorAll('.nav-dot').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      EventBus.emit('camera:goto', { waypoint: btn.dataset.waypoint });
+    });
+  }
 
-      // Coordinate with GSAP timeline in CameraRig
-      this.cameraRig.flyTo(waypoint);
+  _setActive(waypoint) {
+    this.container.querySelectorAll('.nav-dot').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.waypoint === waypoint);
     });
   }
 }

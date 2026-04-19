@@ -1,16 +1,15 @@
 import { gsap } from 'gsap';
-import * as THREE from 'three';
 import EventBus from '../core/EventBus.js';
 import Store from '../core/Store.js';
 import KitchenModel from './KitchenModel.js';
 
 /**
  * AnimationController — manages open/close GSAP timelines for
- * drawers (translate Z) and cabinet doors (rotate Y around pivot).
+ * drawers (translate Z) and cabinet doors (rotate Y around hinge pivot group).
  */
 
 const _DRAWER_OPEN_Z  = 0.38;   // metres to slide out
-const _DOOR_OPEN_DEG  = -95;   // degrees to swing open (left-hinged)
+const _DOOR_OPEN_DEG  = -95;    // degrees to swing open (left-hinged)
 const _DURATION       = 0.55;
 const _EASE           = 'power3.inOut';
 
@@ -39,15 +38,15 @@ const AnimationController = {
     const mesh = KitchenModel.getMesh(partName);
     if (!mesh || _openParts.has(partName)) return;
 
-    // Kill any running tween on this part
     _activeTweens.get(partName)?.kill();
 
     const isDrawer = partName.startsWith('drawer_');
     const isDoor   = partName.startsWith('door_');
 
     if (isDrawer) {
+      const dir = mesh.userData.openDir ?? 1;
       const tween = gsap.to(mesh.position, {
-        z: mesh.position.z + _DRAWER_OPEN_Z,
+        z: mesh.position.z + _DRAWER_OPEN_Z * dir,
         duration: _DURATION,
         ease: _EASE,
         onComplete: () => {
@@ -58,11 +57,10 @@ const AnimationController = {
       });
       _activeTweens.set(partName, tween);
     } else if (isDoor) {
-      // Doors rotate around their left edge (pivot stored in userData or estimated)
-      const pivotOffset = mesh.userData.pivotOffset ?? new THREE.Vector3(-mesh.geometry.parameters.width / 2 ?? -0.45, 0, 0);
-      // Translate pivot to world origin, rotate, translate back
-      const rad = THREE.MathUtils.degToRad(_DOOR_OPEN_DEG);
-      const tween = gsap.to(mesh.rotation, {
+      // Rotate the hinge pivot group (parent) — falls back to mesh if unparented.
+      const target = _hingeFor(mesh);
+      const rad = (_DOOR_OPEN_DEG * Math.PI) / 180;
+      const tween = gsap.to(target.rotation, {
         y: rad,
         duration: _DURATION + 0.1,
         ease: _EASE,
@@ -86,8 +84,9 @@ const AnimationController = {
     const isDoor   = partName.startsWith('door_');
 
     if (isDrawer) {
+      const dir = mesh.userData.openDir ?? 1;
       const tween = gsap.to(mesh.position, {
-        z: mesh.position.z - _DRAWER_OPEN_Z,
+        z: mesh.position.z - _DRAWER_OPEN_Z * dir,
         duration: _DURATION,
         ease: _EASE,
         onComplete: () => {
@@ -98,7 +97,8 @@ const AnimationController = {
       });
       _activeTweens.set(partName, tween);
     } else if (isDoor) {
-      const tween = gsap.to(mesh.rotation, {
+      const target = _hingeFor(mesh);
+      const tween = gsap.to(target.rotation, {
         y: 0,
         duration: _DURATION,
         ease: _EASE,
@@ -123,6 +123,18 @@ const AnimationController = {
     return _openParts.has(partName);
   },
 };
+
+/**
+ * Resolve the object to rotate so the door swings around its hinge edge.
+ * Prefers the mesh's parent if it's a named pivot group.
+ */
+function _hingeFor(mesh) {
+  const parent = mesh.parent;
+  if (parent && parent.isGroup && parent.name.startsWith('pivot_')) {
+    return parent;
+  }
+  return mesh;
+}
 
 function _syncStore() {
   Store.state.openParts = [..._openParts];
