@@ -196,6 +196,35 @@ async function bootstrap() {
   window.addEventListener('keydown', resetIdle);
   resetIdle();
 
+  // ── Play mode toggle (mobile) ─────────────────────────
+  // Default: touch-action=pan-y so vertical swipes scroll the page.
+  // When the user taps "Rotate", switch to touch-action=none so OrbitControls
+  // gets all touch events. Auto-exit when the hero scrolls out of view.
+  const playToggle = document.getElementById('play-toggle');
+  let _playMode = false;
+
+  function _setPlayMode(on) {
+    _playMode = on;
+    canvas.style.touchAction = on ? 'none' : 'pan-y';
+    playToggle?.classList.toggle('active', on);
+    playToggle?.setAttribute('aria-pressed', String(on));
+    if (playToggle) {
+      playToggle.querySelector('.play-toggle-label').textContent = on ? 'Done' : 'Rotate';
+      playToggle.setAttribute('aria-label', on ? 'Exit 3D rotation' : 'Enable 3D rotation');
+    }
+  }
+
+  playToggle?.addEventListener('click', () => _setPlayMode(!_playMode));
+
+  // Auto-exit play mode when the hero leaves the viewport
+  const heroEl = document.getElementById('hero');
+  if (heroEl && 'IntersectionObserver' in window) {
+    new IntersectionObserver(
+      ([entry]) => { if (!entry.isIntersecting && _playMode) _setPlayMode(false); },
+      { threshold: 0.1 },
+    ).observe(heroEl);
+  }
+
   // ── Loading complete ──────────────────────────────────
   EventBus.emit('loading:progress', { progress: 1 });
   _hideLoadingScreen();

@@ -44,6 +44,10 @@ class CameraRig {
     this.controls.minAzimuthAngle = -Math.PI * 0.44;
     this.controls.maxAzimuthAngle =  Math.PI * 0.44;
 
+    // OrbitControls sets touch-action:none on the canvas which blocks mobile page scroll.
+    // Override to pan-y: vertical swipes scroll the page; horizontal swipes rotate the model.
+    canvas.style.touchAction = 'pan-y';
+
     // Re-render whenever the user drags the camera
     this.controls.addEventListener('change', () => sceneManager?.requestRender(3));
 

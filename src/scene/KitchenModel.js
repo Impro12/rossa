@@ -172,30 +172,32 @@ function _buildProceduralScene(root) {
       [x, BAY_H / 2, baseZ], `facade_base_${idx}`, zoneBase);
 
     if (kind === 'd') {
-      const gap = 0.012;
-      const dh  = (BAY_H - 0.06 - gap * 2) / 3;
-      const DRAWER_DEPTH = BAY_D - 0.06; // box reaches almost to cabinet back
+      // Overlay drawer faces — cover the full bay with a small 4 mm reveal between faces.
+      // 3 drawers + 4 reveals (top edge, two betweens, bottom edge) span the bay height.
+      const REVEAL = 0.004;
+      const fW = BAY_W - REVEAL * 2;
+      const fH = (BAY_H - REVEAL * 4) / 3;
+      const DRAWER_DEPTH = BAY_D - 0.06;
       for (let k = 0; k < 3; k++) {
-        const y  = 0.03 + dh / 2 + k * (dh + gap);
+        const y  = REVEAL + fH / 2 + k * (fH + REVEAL);
         const di = String(k + 1);
-        const fW = BAY_W - 0.02 - _PANEL * 2; // face fits inside the shell
-        const drawer = _box(facadeMat, [fW, dh - _PANEL, 0.02],
+        const drawer = _box(facadeMat, [fW, fH, 0.02],
           [x, y, baseZ + BAY_D / 2 + 0.011], `drawer_base_${idx}_${di}`);
         drawer.userData.openDir = 1;
-        // Handle
         drawer.add(_box(0xd0d0d0, [0.16, 0.015, 0.015],
-          [0, dh / 2 - 0.04, 0.014], `handle_base_${idx}_${di}`));
-        // Drawer box extends into cabinet
-        _drawerBox(interiorMat, drawer, fW, dh - _PANEL, DRAWER_DEPTH);
+          [0, fH / 2 - 0.04, 0.014], `handle_base_${idx}_${di}`));
+        _drawerBox(interiorMat, drawer, fW - REVEAL * 2, fH - REVEAL, DRAWER_DEPTH);
         zoneBase.add(drawer);
       }
     } else {
-      // Door — hinged at left edge; handle is a pivot child so it swings along
-      const doorW = BAY_W - 0.02 - _PANEL * 2;
+      // Overlay door — covers the full bay minus a 4 mm reveal on each edge.
+      const REVEAL = 0.004;
+      const doorW = BAY_W - REVEAL * 2;
+      const doorH = BAY_H - REVEAL * 2;
       const pivot = new THREE.Group();
       pivot.name = `pivot_door_base_${idx}`;
       pivot.position.set(x - doorW / 2, BAY_H / 2, baseZ + BAY_D / 2 + 0.011);
-      pivot.add(_box(facadeMat, [doorW, BAY_H - 0.06, 0.02],
+      pivot.add(_box(facadeMat, [doorW, doorH, 0.02],
         [doorW / 2, 0, 0], `door_base_${idx}`));
       pivot.add(_box(0xd0d0d0, [0.015, 0.18, 0.015],
         [doorW - 0.04, 0, 0.014], `handle_base_${idx}`));
@@ -233,11 +235,13 @@ function _buildProceduralScene(root) {
     const UH = 0.7, UD = 0.35, UY = 1.9;
     _cabinetShell(facadeUpperMat, interiorMat, [BAY_W, UH, UD],
       [x, UY, -3.5 + UD / 2], `facade_upper_${idx}`, zoneUpper);
-    const doorW = BAY_W - 0.02 - _PANEL * 2;
+    const REVEAL = 0.004;
+    const doorW = BAY_W - REVEAL * 2;
+    const doorH = UH - REVEAL * 2;
     const pivot = new THREE.Group();
     pivot.name = `pivot_door_upper_${idx}`;
     pivot.position.set(x - doorW / 2, UY, -3.5 + UD + 0.011);
-    pivot.add(_box(facadeUpperMat, [doorW, UH - 0.04, 0.02],
+    pivot.add(_box(facadeUpperMat, [doorW, doorH, 0.02],
       [doorW / 2, 0, 0], `door_upper_${idx}`));
     pivot.add(_box(0xd0d0d0, [0.015, 0.15, 0.015],
       [doorW - 0.04, -UH / 2 + 0.1, 0.014], `handle_upper_${idx}`));

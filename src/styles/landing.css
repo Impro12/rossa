@@ -371,3 +371,56 @@
   .nav-dot .label { display: none; }
   .nav-dots { gap: 10px; bottom: 12px; }
 }
+
+/* ── Play Mode Toggle (touch devices only) ────────────── */
+.play-toggle {
+  display: none; /* hidden until touch media query overrides */
+  position: absolute;
+  bottom: 80px;
+  right: 16px;
+  z-index: calc(var(--z-toolbar) + 2);
+  pointer-events: auto;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 16px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-md);
+  color: rgba(247, 244, 239, 0.75);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--transition-base), border-color var(--transition-base), color var(--transition-base);
+  animation: fadeInUp 0.6s 0.8s both;
+}
+
+/* Show only on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .play-toggle { display: flex; }
+}
+
+.play-toggle .done-icon { display: none; }
+.play-toggle .play-icon { display: block; }
+
+.play-toggle.active {
+  background: rgba(196, 168, 130, 0.18);
+  border-color: rgba(196, 168, 130, 0.45);
+  color: var(--color-warm-gold);
+}
+.play-toggle.active .play-icon { display: none; }
+.play-toggle.active .done-icon { display: block; }
+
+@media (max-width: 480px) {
+  .play-toggle {
+    bottom: 68px;
+    right: 12px;
+    padding: 9px 13px;
+    font-size: 10px;
+  }
+}

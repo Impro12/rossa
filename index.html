@@ -148,6 +148,18 @@
 
       <!-- Tooltip -->
       <div id="tooltip" class="tooltip" role="tooltip" aria-live="polite"></div>
+
+      <!-- Play mode toggle — touch devices only -->
+      <button id="play-toggle" class="play-toggle" aria-label="Enable 3D rotation" aria-pressed="false">
+        <svg class="play-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12a9 9 0 1 1-2.5-6.2"/>
+          <polyline points="21 3 21 8 16 8"/>
+        </svg>
+        <svg class="done-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+        <span class="play-toggle-label">Rotate</span>
+      </button>
     </div><!-- /canvas-wrapper -->
   </section>
 
