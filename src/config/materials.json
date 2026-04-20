@@ -7,8 +7,6 @@
       "roughness": 0.08,
       "metalness": 0.02,
       "clearcoat": 0.3,
-      "texturePath": "/textures/countertops/marble",
-      "textureFiles": { "diff": "diff.ktx2", "nor": "nor.ktx2", "rough": "rough.ktx2" },
       "priceDelta": 2200
     },
     {
@@ -18,31 +16,43 @@
       "roughness": 0.7,
       "metalness": 0.0,
       "clearcoat": 0.05,
-      "texturePath": "/textures/countertops/wood",
-      "textureFiles": { "diff": "diff.ktx2", "nor": "nor.ktx2", "rough": "rough.ktx2" },
       "priceDelta": 800
     },
     {
-      "id": "concrete",
-      "name": "Polished Concrete",
-      "description": "Industrial micro-cement finish, sealed and smooth",
-      "roughness": 0.45,
-      "metalness": 0.0,
-      "clearcoat": 0.15,
-      "texturePath": "/textures/countertops/concrete",
-      "textureFiles": { "diff": "diff.ktx2", "nor": "nor.ktx2", "rough": "rough.ktx2" },
-      "priceDelta": 1100
+      "id": "black-granite",
+      "name": "Black Granite",
+      "description": "Deep black granite with subtle crystalline shimmer",
+      "roughness": 0.12,
+      "metalness": 0.02,
+      "clearcoat": 0.4,
+      "priceDelta": 2800
     },
     {
-      "id": "quartz",
-      "name": "Snow Quartz",
-      "description": "Engineered quartz with consistent snow-white surface",
-      "roughness": 0.1,
+      "id": "forest-slate",
+      "name": "Forest Slate",
+      "description": "Dark green-grey natural slate with layered texture",
+      "roughness": 0.5,
       "metalness": 0.0,
+      "clearcoat": 0.1,
+      "priceDelta": 1400
+    },
+    {
+      "id": "midnight",
+      "name": "Midnight Blue",
+      "description": "Deep navy engineered stone with cool mineral tones",
+      "roughness": 0.2,
+      "metalness": 0.05,
       "clearcoat": 0.2,
-      "texturePath": "/textures/countertops/quartz",
-      "textureFiles": { "diff": "diff.ktx2", "nor": "nor.ktx2", "rough": "rough.ktx2" },
-      "priceDelta": 1800
+      "priceDelta": 2400
+    },
+    {
+      "id": "terracotta",
+      "name": "Terracotta",
+      "description": "Earthy red-brown fired clay with rustic character",
+      "roughness": 0.6,
+      "metalness": 0.0,
+      "clearcoat": 0.0,
+      "priceDelta": 1200
     }
   ],
   "handles": [

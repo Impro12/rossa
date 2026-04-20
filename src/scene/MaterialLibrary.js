@@ -18,20 +18,25 @@ const _handleMats = new Map();
 /** loaded from config JSON */
 let _colorsConfig = [];
 let _materialsConfig = { countertops: [], handles: [] };
+let _texturesConfig = [];
+let _activeTexture = null;
 
 const MaterialLibrary = {
   /**
    * @param {Object} colorsConfig
    * @param {Object} materialsConfig
+   * @param {Array}  texturesConfig
    */
-  init(colorsConfig, materialsConfig) {
-    _colorsConfig = colorsConfig.colors;
+  init(colorsConfig, materialsConfig, texturesConfig = []) {
+    _colorsConfig   = colorsConfig.colors;
     _materialsConfig = materialsConfig;
+    _texturesConfig = texturesConfig;
 
     // Listen to config events
-    EventBus.on('config:facadeColor',  (e) => this.setFacadeColor(e.detail.colorId));
-    EventBus.on('config:countertop',   (e) => this.setCountertopMaterial(e.detail.materialId));
-    EventBus.on('config:handleFinish', (e) => this.setHandleFinish(e.detail.finishId));
+    EventBus.on('config:facadeColor',   (e) => this.setFacadeColor(e.detail.colorId));
+    EventBus.on('config:facadeTexture', (e) => this.setFacadeTexture(e.detail.textureId));
+    EventBus.on('config:countertop',    (e) => this.setCountertopMaterial(e.detail.materialId));
+    EventBus.on('config:handleFinish',  (e) => this.setHandleFinish(e.detail.finishId));
   },
 
   // ── Facade ────────────────────────────────────────────
@@ -44,11 +49,16 @@ const MaterialLibrary = {
     if (!_facadeMats.has(colorId)) {
       const mat = new THREE.MeshStandardMaterial({
         color:     new THREE.Color(def.hex),
-        roughness: def.roughness,
-        metalness: def.metalness,
+        roughness: _activeTexture ? _activeTexture.roughness : def.roughness,
+        metalness: _activeTexture ? _activeTexture.metalness : def.metalness,
         name:      `facade_${colorId}`,
       });
       _facadeMats.set(colorId, mat);
+    } else if (_activeTexture) {
+      const mat = _facadeMats.get(colorId);
+      mat.roughness = _activeTexture.roughness;
+      mat.metalness = _activeTexture.metalness;
+      mat.needsUpdate = true;
     }
 
     const mat = _facadeMats.get(colorId);
@@ -57,6 +67,22 @@ const MaterialLibrary = {
     KitchenModel.getMeshesByPrefix('door_').forEach(m => { m.material = mat; });
 
     Store.state.facadeColorId = colorId;
+    _updatePrice();
+  },
+
+  // ── Facade Texture ────────────────────────────────────
+
+  /** @param {string} textureId */
+  setFacadeTexture(textureId) {
+    const def = _texturesConfig.find(t => t.id === textureId);
+    if (!def) return;
+    _activeTexture = def;
+    Store.state.facadeTextureId = textureId;
+    for (const mat of _facadeMats.values()) {
+      mat.roughness = def.roughness;
+      mat.metalness = def.metalness;
+      mat.needsUpdate = true;
+    }
     _updatePrice();
   },
 
@@ -92,7 +118,11 @@ const MaterialLibrary = {
         mat.needsUpdate = true;
       } catch {
         // Use color-only fallback
-        const colorMap = { marble: 0xdbd7d2, wood: 0x8b6914, concrete: 0x909090, quartz: 0xe8e4df };
+        const colorMap = {
+          marble: 0xdbd7d2, wood: 0x8b6914, concrete: 0x909090, quartz: 0xe8e4df,
+          'black-granite': 0x1c1c1e, 'forest-slate': 0x3b4a3e, sahara: 0xc4a97d,
+          terracotta: 0xc17a56, midnight: 0x1e2d40, terrazzo: 0xd4c5b0,
+        };
         mat.color.set(colorMap[materialId] ?? 0xcccccc);
       }
 

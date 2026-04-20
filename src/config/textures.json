@@ -1,0 +1,8 @@
+[
+  { "id": "t_matte",   "name": "Matte",        "roughness": 0.85, "metalness": 0.0  },
+  { "id": "t_satin",   "name": "Satin",         "roughness": 0.45, "metalness": 0.02 },
+  { "id": "t_gloss",   "name": "High Gloss",    "roughness": 0.06, "metalness": 0.02 },
+  { "id": "t_velvet",  "name": "Velvet",        "roughness": 0.95, "metalness": 0.0  },
+  { "id": "t_pearl",   "name": "Pearl",         "roughness": 0.25, "metalness": 0.15 },
+  { "id": "t_brushed", "name": "Brushed",       "roughness": 0.38, "metalness": 0.75 }
+]

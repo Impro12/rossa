@@ -23,6 +23,7 @@ import Tooltip from './ui/Tooltip.js';
 // Config
 import colorsConfig from './config/colors.json';
 import materialsConfig from './config/materials.json';
+import texturesConfig from './config/textures.json';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -101,10 +102,11 @@ async function bootstrap() {
   await KitchenModel.init(sceneManager.scene);
 
   // ── Materials ─────────────────────────────────────────
-  MaterialLibrary.init({ colors: colorsConfig }, materialsConfig);
+  MaterialLibrary.init({ colors: colorsConfig }, materialsConfig, texturesConfig);
 
   // Apply initial defaults so the scene matches the store state
   MaterialLibrary.setFacadeColor('f_arctic');
+  MaterialLibrary.setFacadeTexture('t_matte');
   MaterialLibrary.setCountertopMaterial('marble');
   MaterialLibrary.setHandleFinish('chrome');
 
@@ -119,7 +121,7 @@ async function bootstrap() {
   // ── UI ────────────────────────────────────────────────
   UIManager.init();
   Toolbar.init();
-  ColorPicker.init({ colors: colorsConfig });
+  ColorPicker.init({ colors: colorsConfig }, texturesConfig);
   MaterialSwitcher.init(materialsConfig);
   Tooltip.init();
 

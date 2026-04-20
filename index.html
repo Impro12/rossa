@@ -84,15 +84,7 @@
             </svg>
             <span>Storage</span>
           </button>
-          <button class="toolbar-btn" data-waypoint="appliances" aria-label="Appliances view">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-              <rect x="3" y="3" width="12" height="12" rx="1"/>
-              <rect x="6" y="8" width="6" height="5" rx="0.5"/>
-              <circle cx="6.5" cy="5.5" r="1" fill="currentColor" stroke="none"/>
-              <circle cx="11.5" cy="5.5" r="1" fill="currentColor" stroke="none"/>
-            </svg>
-            <span>Appliances</span>
-          </button>
+
           <div class="toolbar-divider" aria-hidden="true"></div>
           <button class="toolbar-btn panel-toggle" data-panel="colors" aria-label="Facade colours" aria-controls="panel-colors" aria-expanded="false">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
@@ -119,7 +111,11 @@
             <button class="panel-close" data-panel="colors" aria-label="Close panel">✕</button>
           </div>
           <div id="color-swatches" class="swatch-grid"></div>
-          <p class="panel-hint">Select a finish to preview on the 3D model</p>
+          <div class="panel-subsection">
+            <p class="panel-subsection-title">Surface Finish</p>
+            <div id="texture-swatches" class="texture-grid"></div>
+          </div>
+          <p class="panel-hint">Select a colour and finish to preview on the 3D model</p>
         </div>
 
         <!-- Surfaces & hardware panel -->

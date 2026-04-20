@@ -122,6 +122,78 @@
   letter-spacing: 0.03em;
 }
 
+/* ── Panel Subsection ─────────────────────────────────── */
+.panel-subsection {
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.panel-subsection-title {
+  font-size: var(--text-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-3);
+  font-weight: 500;
+  font-family: var(--font-sans);
+}
+
+/* ── Texture Grid ─────────────────────────────────────── */
+.texture-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.texture-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-border);
+  overflow: hidden;
+  transition:
+    border-color var(--transition-base),
+    transform var(--transition-fast),
+    box-shadow var(--transition-base);
+}
+
+.texture-btn:hover {
+  border-color: var(--color-border-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.texture-btn.active {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.texture-preview {
+  display: block;
+  width: 100%;
+  height: 44px;
+  flex-shrink: 0;
+}
+
+.texture-label {
+  display: block;
+  width: 100%;
+  padding: 4px 4px 5px;
+  font-size: 10px;
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+  text-align: center;
+  background: var(--color-surface-2);
+  line-height: 1;
+}
+
+.texture-btn.active .texture-label {
+  color: var(--color-accent);
+}
+
 /* ── Material Cards ───────────────────────────────────── */
 .mat-section {
   margin-bottom: var(--space-6);

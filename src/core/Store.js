@@ -11,6 +11,7 @@ const _defaults = {
   loadProgress: 0,
   isLoaded: false,
   facadeColorId: 'f_arctic',
+  facadeTextureId: 't_matte',
   countertopMaterialId: 'marble',
   handleFinishId: 'chrome',
   activeWaypoint: 'overview',
