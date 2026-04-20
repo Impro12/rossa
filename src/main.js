@@ -27,6 +27,127 @@ import texturesConfig from './config/textures.json';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// ── Door Styles Section ───────────────────────────────
+const _DOOR_STYLES = [
+  { id: 'flat',       name: 'Flat Slab',   desc: 'Pure minimalism — no profile, no distraction.'  },
+  { id: 'shaker',     name: 'Shaker',       desc: 'Classic inset frame, timeless in any palette.'  },
+  { id: 'grooved',    name: 'Grooved',      desc: 'Horizontal grain lines for tactile depth.'       },
+  { id: 'ribbed',     name: 'Ribbed',       desc: 'Vertical fluting — bold and contemporary.'      },
+  { id: 'arched',     name: 'Arched',       desc: 'Soft arch on the upper rail, quietly elegant.'  },
+  { id: 'handleless', name: 'Handleless',   desc: 'Push-to-open recessed grip, seamless front.'    },
+];
+
+function _buildDoorStrip() {
+  const strip = document.getElementById('door-strip');
+  if (!strip) return;
+
+  _DOOR_STYLES.forEach((style, i) => {
+    const defaultColor = colorsConfig[i % colorsConfig.length];
+    const card = document.createElement('article');
+    card.className = 'door-card gsap-reveal-up';
+    card.dataset.delay = String(i * 0.07);
+
+    card.innerHTML = `
+      <div class="door-preview">
+        <div class="door-preview-inner">
+          <div class="door-face" style="background:${defaultColor.hex}"></div>
+          <div class="door-overlay door-overlay--${style.id}"></div>
+        </div>
+      </div>
+      <div class="door-card-info">
+        <h3>${style.name}</h3>
+        <p>${style.desc}</p>
+        <div class="door-swatches">
+          ${colorsConfig.map(c => `
+            <button class="door-swatch ${c.id === defaultColor.id ? 'active' : ''}"
+                    data-hex="${c.hex}" data-color-id="${c.id}"
+                    title="${c.name}" style="background:${c.hex}"></button>
+          `).join('')}
+        </div>
+        <button class="door-try-btn" data-color-id="${defaultColor.id}">Try in 3D →</button>
+      </div>
+    `;
+
+    card.querySelectorAll('.door-swatch').forEach(sw => {
+      sw.addEventListener('click', () => {
+        card.querySelector('.door-face').style.background = sw.dataset.hex;
+        card.querySelectorAll('.door-swatch').forEach(s => s.classList.remove('active'));
+        sw.classList.add('active');
+        card.querySelector('.door-try-btn').dataset.colorId = sw.dataset.colorId;
+      });
+    });
+
+    card.querySelector('.door-try-btn').addEventListener('click', () => {
+      const colorId = card.querySelector('.door-try-btn').dataset.colorId;
+      EventBus.emit('config:facadeColor', { colorId });
+      document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    strip.appendChild(card);
+  });
+}
+
+// ── Materials Showcase Section ────────────────────────
+const _SHOWCASE_MATS = [
+  {
+    id: 'marble',
+    name: 'Carrara Marble',
+    origin: 'Tuscany, Italy',
+    desc: 'Sourced from the same quarries that supplied Michelangelo. White with soft grey veining — no two slabs are identical.',
+    price: '+$2,200',
+    gradient: 'linear-gradient(135deg, #f0ede8 0%, #e8e4de 30%, #dbd7d2 55%, #e4e0da 75%, #f2efea 100%)',
+    cls: 'mat-slab--marble',
+  },
+  {
+    id: 'wood',
+    name: 'European Oak',
+    origin: 'Black Forest, Germany',
+    desc: 'FSC-certified solid oak, air-dried for two years before cutting. The open grain catches light differently at every hour.',
+    price: '+$800',
+    gradient: 'linear-gradient(160deg, #c8a96e 0%, #b8925a 20%, #c9a46a 40%, #a07840 60%, #b89058 80%, #c4a060 100%)',
+    cls: 'mat-slab--wood',
+  },
+  {
+    id: 'black-granite',
+    name: 'Black Granite',
+    origin: 'Karnataka, India',
+    desc: 'Absolute black granite polished to a mirror finish. Impervious to heat, acid, and time — it grounds any palette.',
+    price: '+$2,800',
+    gradient: 'linear-gradient(135deg, #1a1a1c 0%, #252527 25%, #1c1c1e 55%, #2a2a2c 80%, #1a1a1c 100%)',
+    cls: 'mat-slab--granite',
+  },
+];
+
+function _buildMatShowcase() {
+  const list = document.getElementById('mat-showcase-list');
+  if (!list) return;
+
+  _SHOWCASE_MATS.forEach(mat => {
+    const row = document.createElement('div');
+    row.className = 'mat-showcase-row gsap-reveal-up';
+
+    row.innerHTML = `
+      <div class="mat-slab ${mat.cls}">
+        <div class="mat-slab-inner" style="background:${mat.gradient}"></div>
+      </div>
+      <div class="mat-text">
+        <span class="mat-showcase-origin">${mat.origin}</span>
+        <h3 class="mat-showcase-name">${mat.name}</h3>
+        <p class="mat-showcase-desc">${mat.desc}</p>
+        <p class="mat-showcase-price">Price upgrade from ${mat.price}</p>
+        <button class="mat-try-btn" data-mat-id="${mat.id}">Try This Surface →</button>
+      </div>
+    `;
+
+    row.querySelector('.mat-try-btn').addEventListener('click', () => {
+      EventBus.emit('config:countertop', { materialId: mat.id });
+      document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    list.appendChild(row);
+  });
+}
+
 async function bootstrap() {
   const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -230,6 +351,10 @@ async function bootstrap() {
   // ── Loading complete ──────────────────────────────────
   EventBus.emit('loading:progress', { progress: 1 });
   _hideLoadingScreen();
+
+  // ── Landing page dynamic sections ────────────────────
+  _buildDoorStrip();
+  _buildMatShowcase();
 
   // ── ScrollTrigger animations ──────────────────────────
   if (!isReducedMotion) {
